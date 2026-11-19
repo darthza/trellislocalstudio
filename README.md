@@ -4,6 +4,20 @@ A small local image-to-3D studio with a durable generation queue, live logs, a m
 
 **Status:** first usable release, currently targeted at macOS on Apple Silicon with 16 GB or more unified memory. The application supports image-conditioned generation only; the notes field stores metadata and does not act as a text prompt.
 
+![TrellisLocalStudio create screen and example library](docs/images/studio-screenshot.jpg)
+
+The screenshot shows the local create screen and a sample library card. Open a model to orbit it in the interactive preview:
+
+![Interactive model preview](docs/images/model-viewer-screenshot.jpg)
+
+## Example: reference image to generated asset
+
+This real TRELLIS.2 MLX result was generated from the single reference image below with the balanced profile. The right image is a studio render of the resulting textured GLB. It shows one run, not a promise that every generation will match the reference exactly; inspect geometry and textures before using a model in production.
+
+| Input reference | Generated GLB render |
+| --- | --- |
+| ![Curved wooden bench reference image](docs/images/example-reference.png) | ![Generated curved wooden bench 3D asset](docs/images/example-generated-asset.png) |
+
 ## Features
 
 - Drop in a single-object PNG, JPEG, or WebP reference (under 20 MB, at least 256 px on each side).
