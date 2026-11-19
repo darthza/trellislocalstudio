@@ -17,13 +17,13 @@ function navigate(){
   const requested=location.hash.slice(1)||'create';state.view=['create','queue','library','connect'].includes(requested)?requested:'create';
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('hidden',v.id!=='view-'+state.view));
   document.querySelectorAll('nav [data-view]').forEach(a=>a.classList.toggle('active',a.dataset.view===state.view));
-  $('#breadcrumb').textContent={create:'Create asset',queue:'Generation queue',library:'Asset library',connect:'Agent connection'}[state.view];
+  $('#breadcrumb').textContent={create:'Create',queue:'Queue',library:'Library',connect:'MCP connection'}[state.view];
   if(state.view==='library')renderLibrary();
 }
 function pill(status){return `<span class="status-pill ${esc(status)}">${esc(({completed:'Ready for review',queued:'Queued',running:'Generating',cancelling:'Stopping',interrupted:'Interrupted',cancelled:'Cancelled',failed:'Needs attention'})[status]||status)}</span>`;}
 function activeMarkup(job,compact=false){
-  if(!job)return `<div class="idle"><div class="idle-icon">✧</div><h3>Ready for the next idea.</h3><p>Add a reference to begin. Your queued assets will appear here.</p></div>`;
-  return `<div class="${compact?'':'panel active-box'}"><div class="active-label">${pill(job.status)}<span class="muted">${esc(elapsed(job))} elapsed</span></div><h3 class="active-name">${esc(job.name)}</h3><div class="active-stage">${esc(job.stage||'Starting the local generator…')}</div><div class="indeterminate" aria-label="Generation in progress"></div><div class="active-meta">${esc(title(job.profile))} · ${esc(job.category)} · seed ${esc(job.seed)}</div><div class="active-footer"><span class="muted">Sources and logs are saved</span><div class="job-actions"><button class="button secondary small" data-action="log" data-id="${job.id}">Live log</button><button class="button danger small" data-action="cancel" data-id="${job.id}" ${job.status==='cancelling'?'disabled':''}>Cancel</button></div></div></div>`;
+  if(!job)return `<div class="idle"><h3>No active job</h3><p>Add a reference image to start a generation.</p></div>`;
+  return `<div class="${compact?'':'panel active-box'}"><div class="active-label">${pill(job.status)}<span class="muted">${esc(elapsed(job))} elapsed</span></div><h3 class="active-name">${esc(job.name)}</h3><div class="active-stage">${esc(job.stage||'Starting generator…')}</div><div class="indeterminate" aria-label="Generation in progress"></div><div class="active-meta">${esc(title(job.profile))} · ${esc(job.category)} · seed ${esc(job.seed)}</div><div class="active-footer"><span class="muted">Logs are saved with the job</span><div class="job-actions"><button class="button secondary small" data-action="log" data-id="${job.id}">View log</button><button class="button danger small" data-action="cancel" data-id="${job.id}" ${job.status==='cancelling'?'disabled':''}>Cancel</button></div></div></div>`;
 }
 function renderStatus(){
   const s=state.status;if(!s)return;
@@ -31,19 +31,19 @@ function renderStatus(){
   $('#queue-count').textContent=s.queued+(active?1:0);$('#library-count').textContent=state.assets.length;
   $('#top-status').textContent=!s.generator_ready?'Generator setup needed':active?'Local generation in progress':s.paused?'Queue paused':s.external_generator_busy?'Local generator busy':'Local generator ready';
   $('#mcp-state').textContent='Ready';$('#activity').innerHTML=activeMarkup(active,true);
-  if(!active&&s.queued){$('#activity').innerHTML=`<div class="idle"><div class="idle-icon">◷</div><h3>${s.paused?'Taking a breather.':s.external_generator_busy?'Generator already at work.':'Preparing the next asset.'}</h3><p>${s.queued} asset${s.queued===1?'':'s'} waiting.${s.paused?' Resume the queue when you’re ready.':s.external_generator_busy?' The queue will start when the current local generation finishes.':''}</p></div>`;}
+  if(!active&&s.queued){$('#activity').innerHTML=`<div class="idle"><h3>${s.paused?'Queue paused':s.external_generator_busy?'Generator busy':'Starting next job'}</h3><p>${s.queued} job${s.queued===1?'':'s'} waiting.${s.paused?' Resume the queue to continue.':s.external_generator_busy?' The queue will start when the current generation finishes.':''}</p></div>`;}
   $('#mcp-url').value=s.mcp_url;
   const port=new URL(s.url).port;
   $('#mcp-config').textContent=JSON.stringify({mcpServers:{'trellislocalstudio-assets':{command:s.project_root+'/run-asset-studio-mcp.command',args:port==='8766'?[]:['--port',port],env:{TRELLIS_STUDIO_DATA:s.data_dir}}}},null,2);
 }
 function card(asset){
-  return `<button class="asset-card" data-action="inspect" data-id="${asset.id}" aria-label="Inspect ${esc(asset.name)}"><div class="asset-image"><img loading="lazy" src="${asset.poster_url}" alt="${esc(asset.job_id?'Reference for '+asset.name:asset.name+' model preview')}"><span class="asset-category">${esc(asset.category)}</span></div><div class="asset-copy"><strong>${esc(asset.name)}</strong><small>${asset.job_id?'Generated · click to inspect in 3D':'Cleaned source · in 3D projects'}</small></div></button>`;
+  return `<button class="asset-card" data-action="inspect" data-id="${asset.id}" aria-label="Inspect ${esc(asset.name)}"><div class="asset-image"><img loading="lazy" src="${asset.poster_url}" alt="${esc(asset.name)} model preview"><span class="asset-category">${esc(asset.category)}</span></div><div class="asset-copy"><strong>${esc(asset.name)}</strong><small>${asset.job_id?'Generated · select to preview':'Model preview'}</small></div></button>`;
 }
 function renderLibrary(){
   const search=$('#asset-search').value.trim().toLowerCase();
   const items=state.assets.filter(a=>(state.filter==='All'||a.category===state.filter)&&(!search||(a.name+' '+a.notes).toLowerCase().includes(search)));
-  $('#asset-grid').innerHTML=items.length?items.map(card).join(''):'<div class="empty-library">No assets here yet. Create one from a reference image.</div>';
-  $('#recent-assets').innerHTML=state.assets.slice(0,2).map(card).join('')||'<p class="muted">Your first completed assets will appear here.</p>';
+  $('#asset-grid').innerHTML=items.length?items.map(card).join(''):'<div class="empty-library">No assets found.</div>';
+  $('#recent-assets').innerHTML=state.assets.slice(0,2).map(card).join('')||'<p class="muted">No assets yet.</p>';
 }
 function jobRow(job,index,queued){
   let actions=queued?`<button class="icon-button" data-action="move-up" data-id="${job.id}" aria-label="Move ${esc(job.name)} earlier" ${index===0?'disabled':''}>⌃</button><button class="icon-button" data-action="move-down" data-id="${job.id}" aria-label="Move ${esc(job.name)} later" ${index===state.jobs.filter(j=>j.status==='queued').length-1?'disabled':''}>⌄</button><button class="button danger small" data-action="cancel" data-id="${job.id}">Cancel</button>`:
@@ -97,8 +97,8 @@ async function refreshLog(){
 }
 async function openAsset(id){
   const asset=state.assets.find(a=>a.id===id);if(!asset)throw new Error('Asset is not in the library yet.');
-  state.assetId=id;$('#asset-dialog-name').textContent=asset.name;$('#asset-dialog-category').textContent=asset.category;$('#asset-dialog-notes').textContent=asset.notes||'Generated source asset. Inspect from every side before cleanup and game integration.';
-  $('#asset-dialog-meta').textContent=(asset.triangles?asset.triangles.toLocaleString()+' triangles · ':'')+(asset.job_id?'Generated source · review pending':'Cleaned and integrated source')+' · GLB';
+  state.assetId=id;$('#asset-dialog-name').textContent=asset.name;$('#asset-dialog-category').textContent=asset.category;$('#asset-dialog-notes').textContent=asset.notes||'No notes.';
+  $('#asset-dialog-meta').textContent=(asset.triangles?asset.triangles.toLocaleString()+' triangles · ':'')+(asset.job_id?'Generated model':'Model')+' · GLB';
   $('#download-button').href=asset.model_url;$('#download-button').download=asset.name+'.glb';
   const viewer=document.createElement('model-viewer');viewer.setAttribute('camera-controls','');viewer.setAttribute('shadow-intensity','.7');viewer.setAttribute('exposure','1');viewer.setAttribute('environment-image','neutral');viewer.setAttribute('interaction-prompt','none');viewer.setAttribute('alt','Orbitable 3D model of '+asset.name);
   $('#viewer-status').textContent='Loading model from this Mac…';
@@ -124,15 +124,15 @@ document.addEventListener('click',event=>{
 });
 $('#create-form').addEventListener('submit',async event=>{
   event.preventDefault();if(!state.reference)return;
-  $('#enqueue-button').disabled=true;$('#enqueue-button').textContent='Adding to queue…';$('#form-error').classList.add('hidden');
+  $('#enqueue-button').disabled=true;$('#enqueue-button').textContent='Adding…';$('#form-error').classList.add('hidden');
   try{
     const job=await api('/jobs','POST',{name:$('#asset-name').value.trim(),category:$('#category').value,reference_id:state.reference.id,profile:$('#quality').value,seed:Number($('#seed').value),memory_gib:Number($('#memory').value),notes:$('#notes').value});
     toast(job.name+' added to the queue.');$('#asset-name').value='';$('#notes').value='';clearReference();await refresh();
   }catch(error){$('#form-error').textContent=error.message;$('#form-error').classList.remove('hidden');$('#enqueue-button').disabled=false;}
-  finally{$('#enqueue-button').textContent='Add to generation queue';}
+  finally{$('#enqueue-button').textContent='Add to queue';}
 });
 $('#pause-button').addEventListener('click',async()=>{try{await api('/queue','PATCH',{paused:!state.status.paused});await refresh();}catch(error){toast(error.message,true);}});
-$('#quality').addEventListener('change',()=>{const value=$('#quality').value,note=$('#quality-help');note.classList.toggle('warning',['detail','master'].includes(value));note.querySelector('p').textContent=value==='balanced'?'Our verified recipe. Full precision, 4K textures and preserved source geometry.':value==='legacy'?'A lighter, quantized study with 1K textures. Useful for checking shape.':'Experimental on this 16 GB Mac. May stop at the memory limit; quality will never be silently reduced.';});
+$('#quality').addEventListener('change',()=>{const value=$('#quality').value,note=$('#quality-help');note.classList.toggle('warning',['detail','master'].includes(value));note.querySelector('p').textContent=value==='balanced'?'Full precision geometry and 4K textures.':value==='legacy'?'Lower memory use with 1K textures.':'Experimental settings. May exceed the available memory.';});
 $('#asset-search').addEventListener('input',renderLibrary);
 $('#dropzone').addEventListener('click',()=>$('#reference-file').click());
 $('#dropzone').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#reference-file').click();}});

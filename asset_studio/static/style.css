@@ -2,3 +2,58 @@
 
 /* Keep primary controls and form labels readable at ordinary desktop sizes. */
 .creation-panel label,.field-label,.connect-panel label{font-size:14px}.button{font-size:14px}.page-heading p,.connect-panel>p{font-size:16px}.status-pill,.active-stage{font-size:14px}.job-copy strong{font-size:16px}.field-help{font-size:12px}.active-footer{flex-wrap:wrap}
+
+/* Quiet, spacious workspace styling */
+:root{--bg:#17191a;--panel:#1e2021;--panel2:#242728;--border:#35393a;--text:#ececea;--muted:#a5a7a5;--accent:#c2c5bd;--green:#a4b3a7;--sidebar:270px}
+body{font-size:15px;line-height:1.6}
+.sidebar{padding:34px 22px;background:#191b1c}
+.brand{font:600 17px/1.3 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:0;padding:2px 8px 52px;gap:10px}
+.brand svg{width:25px;flex:none;stroke:var(--muted)}
+.brand small{display:none}
+.workspace-label{font-size:10px;letter-spacing:1px}
+nav{gap:7px}
+nav a{padding:12px 11px;font-size:14px}
+.nav-icon{width:18px;font-size:16px;color:#9da19f}
+.sidebar-bottom{padding:22px 10px}
+.sidebar-bottom p{line-height:1.6}
+main{padding:0 52px;max-width:1780px}
+.topbar{height:70px}
+.page-heading{margin:49px 0 38px;align-items:flex-end}
+.eyebrow{color:#a8ada9;font-size:10px;letter-spacing:1.3px;margin-bottom:12px}
+h1{font:600 30px/1.25 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.5px}
+h2{font-size:16px;font-weight:600}
+.page-heading p{margin:8px 0 0;color:#a9acab}
+.create-grid{max-width:1430px;gap:34px;grid-template-columns:minmax(390px,1.03fr) minmax(360px,.97fr)}
+.creation-panel,.activity-panel,.connect-panel{padding:32px}
+.panel{border-radius:8px;background:#1d2021}
+.panel-heading{margin-bottom:26px}
+.creation-panel label,.field-label,.connect-panel label{margin:23px 0 9px}
+.dropzone{height:205px;background:#202324;border-color:#515655}
+.upload-icon{color:#b1b4b1}
+.field-help{line-height:1.6;color:#a3a6a4}
+.quality-note{margin-top:12px;padding:11px 14px}
+.form-row{gap:16px}
+.form-footnote{margin-top:13px}
+.right-column{gap:30px}
+.idle{padding:34px 14px 39px}
+.idle-icon{display:none}
+.idle h3{font:600 16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;margin:0 0 6px}
+.idle p{font-size:14px}
+.worker-note{margin-top:17px;padding-top:16px}
+.worker-note p{margin:0;color:#a5a7a5}
+.subtle-note{padding:3px 4px;color:#a5a7a5}
+.subtle-note p{line-height:1.7}
+.recent-section{padding:2px 0}
+.recent-section .panel-heading{margin-bottom:15px}
+.section-heading{margin:38px 0 14px}
+.asset-grid{gap:22px}
+.asset-card{border-radius:8px}
+.asset-copy{padding:15px 16px}
+.asset-copy small{margin-top:5px}
+.library-toolbar{margin-bottom:25px}
+.connect-grid{gap:24px}
+.connect-panel{line-height:1.7}
+footer{margin-top:60px;padding:22px 0;font-size:11px;color:#969a98}
+footer span{margin-left:12px}
+@media(max-width:1100px){main{padding:0 30px}.create-grid{gap:24px;grid-template-columns:minmax(320px,1fr) minmax(300px,.9fr)}.creation-panel,.activity-panel,.connect-panel{padding:25px}}
+@media(max-width:760px){main{padding:0 20px}.sidebar{padding:17px 20px 0}.brand{padding:0 0 17px;font-size:18px}.page-heading{margin:34px 0 26px;align-items:flex-start}h1{font-size:26px}.create-grid{grid-template-columns:1fr;gap:23px}.creation-panel,.activity-panel,.connect-panel{padding:22px}.dropzone{height:175px}.right-column{gap:23px}.section-heading{margin-top:30px}footer{margin-top:40px}}
