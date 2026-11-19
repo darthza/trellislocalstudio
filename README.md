@@ -37,22 +37,34 @@ The **balanced** profile is the tested default: 512 geometry resolution, unquant
 - Access to the TRELLIS.2 MLX weights used by the pinned runner. The DINOv3 encoder is gated: request access to [facebook/dinov3-vitl16-pretrain-lvd1689m](https://huggingface.co/facebook/dinov3-vitl16-pretrain-lvd1689m) and authenticate locally with `hf auth login`. Never put a Hugging Face token in a config file or share it.
 - Several tens of gigabytes free for model weights, caches, and generated 4K textures.
 
-The included pipeline is based on the public [lyonsno/trellis2mlx](https://github.com/lyonsno/trellis2mlx) project at the pinned revision recorded in `tools/trellis_local_runtime.py`. Its source is downloaded into a user cache on first preflight; it is not copied into this repository. Review that project's license and upstream instructions before use.
+The included pipeline is based on [lyonsno/trellis2mlx](https://github.com/lyonsno/trellis2mlx), cloned at the pinned revision in `tools/trellis_local_runtime.py` during setup. The upstream source stays in the ignored local `vendor/` directory; only the files needed at runtime are copied into the user cache. Review the upstream license and instructions before use.
 
-## Install and run
+## Guided installation
 
 ```bash
 git clone https://github.com/darthza/trellislocalstudio.git
 cd trellislocalstudio
+./install-asset-studio.command
 ```
 
-Install Python 3.11 and `uv` if needed. For example, with Homebrew:
+Run the installer in Terminal on an Apple Silicon Mac. It checks memory and free storage, installs Python 3.11, `uv`, and Git with Homebrew when needed, prepares both Python environments, fetches the pinned generator source, and can launch the studio.
+
+The installer then guides Hugging Face sign-in and model setup. Access to the gated [DINOv3 model](https://huggingface.co/facebook/dinov3-vitl16-pretrain-lvd1689m) must be approved on Hugging Face before its weights can download. The model files take substantial storage; cached files are reused. If access is still pending, the installer can finish the app setup and you can rerun it after approval.
+
+Setup can be resumed by running `./install-asset-studio.command` again. The app opens at **http://127.0.0.1:8766** and runs locally after the browser closes. To stop it, send SIGTERM to the `asset_studio serve` process; the queue remains saved.
+
+If Homebrew is not installed, the installer offers to run Homebrew's official installer, which may ask for your Mac password. You can decline, install it from [brew.sh](https://brew.sh), and rerun this installer.
+
+## Manual installation
+
+The guided installer is recommended. To prepare the same setup manually, install Python 3.11, `uv`, and Git with Homebrew:
 
 ```bash
 brew install python@3.11 uv
+brew install git
 ```
 
-Set up the inference environment using a Python 3.11 interpreter. This installs the pinned Python dependencies into a dedicated environment, not into the system Python:
+Set up the pinned generator source and inference environment. This downloads the upstream source into the ignored local `vendor/` directory and installs Python dependencies into a dedicated environment:
 
 ```bash
 export TRELLIS_UPSTREAM_PYTHON="$(command -v python3.11)"
@@ -60,15 +72,22 @@ export TRELLIS_GENERATOR_PYTHON="$HOME/.cache/trellislocalstudio/trellis-venv/bi
 python3.11 tools/setup_local_trellis.py
 ```
 
-Install the studio and launch it:
+Authenticate and download the model repositories. First request and receive access to the gated DINOv3 model linked above:
+
+```bash
+"$HOME/.cache/trellislocalstudio/trellis-venv/bin/hf" auth login
+"$HOME/.cache/trellislocalstudio/trellis-venv/bin/hf" download microsoft/TRELLIS.2-4B
+"$HOME/.cache/trellislocalstudio/trellis-venv/bin/hf" download microsoft/TRELLIS-image-large
+"$HOME/.cache/trellislocalstudio/trellis-venv/bin/hf" download facebook/dinov3-vitl16-pretrain-lvd1689m
+```
+
+Launch the studio:
 
 ```bash
 python3.11 tools/run_asset_studio.py open
 ```
 
-The command prepares the lightweight web/MCP environment on first run, starts a local-only service at **http://127.0.0.1:8766**, and opens it in your browser. Double-click `run-asset-studio.command` on macOS for the same action. The detached local service continues while the browser is closed. To stop it, find the `asset_studio serve` process and send it SIGTERM; queued work remains saved.
-
-The first generation downloads/loads the required TRELLIS.2 weights and can take several minutes. Model downloads can require separate Hugging Face access. Check the status panel and job logs if a profile is not ready.
+The first generation loads local model weights and can take several minutes. If model downloads were skipped, rerun the guided installer after Hugging Face access is ready. Check the status panel and job logs if a profile is not ready.
 
 ## MCP connection
 

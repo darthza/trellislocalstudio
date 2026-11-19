@@ -28,6 +28,9 @@ def main():
             subprocess.run([uv,'pip','install','--python',str(python),'-r',str(LOCK)],check=True,stdout=sys.stderr,stderr=sys.stderr)
             receipt.write_text(json.dumps({'requirements_sha256':fingerprint})+'\n')
     os.chdir(ROOT)
+    if len(sys.argv) > 1 and sys.argv[1] == 'setup':
+        print('Studio environment ready: '+str(python))
+        return
     os.execv(str(python),[str(python),'-m','asset_studio',*sys.argv[1:]])
 
 
