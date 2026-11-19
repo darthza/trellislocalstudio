@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trellis Local Studio · Asset studio</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231a2526'/%3E%3Cpath d='M9 24C9 9 18 6 25 6c0 13-6 18-16 18Zm0 0L21 10' fill='none' stroke='%23d2a56a' stroke-width='2'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/style.css">
+  <script type="module" src="/static/vendor/model-viewer.min.js"></script>
+  <script defer src="/static/app.js"></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#create"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 25C7 10 17 5 26 5c0 14-7 20-19 20Zm0 0L22 10"/></svg><span>Trellis Local Studio<small>ASSET STUDIO</small></span></a>
+    <div class="workspace-label">LOCAL WORKSPACE</div>
+    <nav aria-label="Studio">
+      <a href="#create" data-view="create" class="active"><span class="nav-icon">✧</span>Create asset</a>
+      <a href="#queue" data-view="queue"><span class="nav-icon">≡</span>Generation queue <span id="queue-count" class="count">0</span></a>
+      <a href="#library" data-view="library"><span class="nav-icon">▦</span>Asset library <span id="library-count" class="count">0</span></a>
+      <a href="#connect" data-view="connect"><span class="nav-icon">⌘</span>Agent connection</a>
+    </nav>
+    <div class="sidebar-bottom"><div class="local-label"><span class="dot"></span>Made on this Mac</div><p>Your references and models stay local.</p><a href="#connect" class="connection-link">MCP server <span id="mcp-state">Starting</span></a></div>
+  </aside>
+  <main>
+    <header class="topbar"><div class="breadcrumb">Workspace <span>/</span> <strong id="breadcrumb">Create asset</strong></div><div class="top-status" id="top-status">Connecting to studio…</div></header>
+    <div id="offline" class="notice error hidden" role="alert">Studio connection lost. Your queue is saved. Reopen the launcher to reconnect.</div>
+    <section id="view-create" class="view">
+      <div class="page-heading"><div><div class="eyebrow">IMAGE TO 3D WORKSHOP</div><h1>Bring your world to life.</h1><p>A reference in. A new piece of 3D projects out.</p></div><a href="#library" class="button secondary">Explore library</a></div>
+      <div class="create-grid">
+        <form id="create-form" class="panel creation-panel">
+          <div class="panel-heading"><h2>Create a 3D asset</h2><span class="tag">IMAGE TO 3D</span></div>
+          <label class="field-label" for="reference-file">Reference image</label>
+          <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Choose a reference image">
+            <div id="drop-placeholder"><div class="upload-icon">◇</div><strong>Drop your reference here</strong><span>or browse your files</span><small>PNG, JPG or WebP · 20 MB max · at least 256 × 256</small></div>
+            <img id="reference-preview" alt="Selected reference" class="hidden"><span id="reference-name" class="reference-name hidden"></span>
+          </div>
+          <input id="reference-file" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+          <p class="field-help">One object, a plain background and a clear silhouette work best.</p>
+          <div class="form-row"><div><label for="asset-name">Asset name</label><input id="asset-name" placeholder="e.g. Weathered orchard gate" required maxlength="100" autocomplete="off"></div><div><label for="category">Category</label><select id="category"><option>Props</option><option>Vegetation</option><option>Buildings</option><option>Characters</option><option>Creatures</option><option>Terrain</option></select></div></div>
+          <label for="quality">Generation quality</label><select id="quality"><option value="balanced">Balanced · 512 geometry, 4K textures</option><option value="legacy">Quick study · 512 geometry, 1K textures</option><option value="detail">Detail · 768 geometry, 4K textures — experimental</option><option value="master">Master · 1024 geometry, 4K textures — experimental</option></select>
+          <div id="quality-help" class="quality-note"><span>✧</span><p>Our verified recipe. Full precision, 4K textures and preserved source geometry.</p></div>
+          <label for="notes">Art notes <span class="optional">optional</span></label><textarea id="notes" rows="2" maxlength="4000" placeholder="Purpose, scale, materials, or cleanup to remember…"></textarea><p class="field-help">Saved with the asset. Generation follows the image, not these notes.</p>
+          <details class="advanced"><summary>Advanced settings</summary><div class="form-row"><div><label for="seed">Seed</label><input id="seed" type="number" value="42" min="0" max="4294967295" step="1" required></div><div><label for="memory">Memory limit (GiB)</label><input id="memory" type="number" value="10" min="4" max="10" step="0.5" required></div></div></details>
+          <div id="form-error" class="notice error hidden" role="alert"></div>
+          <button id="enqueue-button" type="submit" class="button primary wide" disabled>Add to generation queue</button>
+          <div class="form-footnote">Runs in the background. Close this tab whenever you like.</div>
+        </form>
+        <div class="right-column"><section class="panel activity-panel"><div class="panel-heading"><h2>In the workshop</h2><a href="#queue" class="text-link">View queue</a></div><div id="activity"></div><div class="worker-note"><span>◷</span><p>One asset at a time.<br><small>More room for detail. No competing generation jobs.</small></p></div></section>
+          <section class="recent-section"><div class="panel-heading"><h2>Pieces of the world</h2><a href="#library" class="text-link">See all</a></div><div id="recent-assets" class="recent-grid"></div></section>
+          <div class="subtle-note"><span>⌘</span><p>Built for working together.<br><small>Your agent can add jobs and follow results through the <a href="#connect">MCP connection</a>.</small></p></div>
+        </div>
+      </div>
+    </section>
+    <section id="view-queue" class="view hidden"><div class="page-heading"><div><div class="eyebrow">BACKGROUND GENERATION</div><h1>A little patience. A new world.</h1><p>Arrange the work. We’ll take it one asset at a time.</p></div><button id="pause-button" class="button secondary">Pause queue</button></div><div id="queue-banner"></div><div id="queue-active"></div><div class="section-heading"><h2>Up next</h2><span id="pending-count" class="muted"></span></div><div id="pending-jobs" class="panel job-list"></div><div class="section-heading"><h2>Previous generations</h2><span class="muted">Outputs and logs are kept</span></div><div id="past-jobs" class="panel job-list"></div></section>
+    <section id="view-library" class="view hidden"><div class="page-heading"><div><div class="eyebrow">YOUR WORLD, PIECE BY PIECE</div><h1>The asset library.</h1><p>Inspect, download and keep building on what works.</p></div><a href="#create" class="button primary">Create an asset</a></div><div class="library-toolbar"><div class="filters" id="library-filters"><button class="filter active" data-filter="All">All assets</button><button class="filter" data-filter="Vegetation">Vegetation</button><button class="filter" data-filter="Buildings">Buildings</button><button class="filter" data-filter="Props">Props</button><button class="filter" data-filter="Characters">Characters</button><button class="filter" data-filter="Creatures">Creatures</button><button class="filter" data-filter="Terrain">Terrain</button></div><label class="search"><span class="sr-only">Search assets</span><input id="asset-search" type="search" placeholder="Find an asset…"></label></div><div id="asset-grid" class="asset-grid"></div></section>
+    <section id="view-connect" class="view hidden"><div class="page-heading"><div><div class="eyebrow">WORK WITH YOUR AGENT</div><h1>One studio. Shared tools.</h1><p>Your agent and this interface use the same generation queue.</p></div><span class="ready-badge"><span class="dot"></span>Local MCP server ready</span></div><div class="connect-grid"><section class="panel connect-panel"><h2>Connect an MCP client</h2><p>Use the local server address for a client that supports Streamable HTTP.</p><label for="mcp-url">Server address</label><div class="copy-row"><input id="mcp-url" readonly><button class="button secondary" data-action="copy-url">Copy</button></div><p class="field-help">Available on this Mac while the studio is running.</p><h3>Automatic startup with stdio</h3><p>This option starts the studio when an agent connects, even when the browser is closed.</p><pre id="mcp-config"></pre><button class="button secondary" data-action="copy-config">Copy configuration</button></section><section class="panel connect-panel"><h2>What your agent can do</h2><ul class="capability-list"><li><span>✧</span><div><strong>Queue new assets</strong><p>Use a reference image, choose quality and save art notes.</p></div></li><li><span>≡</span><div><strong>Manage the workshop</strong><p>Reorder, pause, cancel or retry jobs.</p></div></li><li><span>◷</span><div><strong>Follow real progress</strong><p>Read the current stage, logs and output receipts.</p></div></li><li><span>▦</span><div><strong>Inspect the library</strong><p>Find model files and completed generation settings.</p></div></li></ul><div class="quality-note"><p>Generation produces a source asset for review. Cleanup, rigging and game installation remain separate steps.</p></div></section></div></section>
+    <footer>TRELLIS LOCAL STUDIO <span>From reference image to 3D model.</span></footer>
+  </main>
+  <div id="toast" class="toast hidden" role="status"></div>
+  <dialog id="asset-dialog"><div class="dialog-head"><div><div id="asset-dialog-category" class="eyebrow"></div><h2 id="asset-dialog-name"></h2></div><button class="icon-button" data-action="close-asset" aria-label="Close asset preview">×</button></div><div id="viewer-area"></div><div id="viewer-status" class="viewer-status" role="status"></div><div class="dialog-info"><p id="asset-dialog-notes"></p><div id="asset-dialog-meta" class="muted"></div><div class="dialog-actions"><button id="reuse-button" class="button secondary">Use reference again</button><a id="download-button" class="button primary" download>Download GLB</a></div></div></dialog>
+  <dialog id="log-dialog"><div class="dialog-head"><div><div class="eyebrow">GENERATION LOG</div><h2 id="log-title"></h2></div><button class="icon-button" data-action="close-log" aria-label="Close generation log">×</button></div><div id="log-job-status" class="log-job-status"></div><pre id="log-text">Loading…</pre></dialog>
+</body></html>
