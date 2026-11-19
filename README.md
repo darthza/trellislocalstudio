@@ -4,7 +4,7 @@ A small local image-to-3D studio with a durable generation queue, live logs, a m
 
 **Status:** first usable release, currently targeted at macOS on Apple Silicon with 16 GB or more unified memory. The application supports image-conditioned generation only; the notes field stores metadata and does not act as a text prompt.
 
-![TrellisLocalStudio create screen and example library](docs/images/studio-screenshot.jpg)
+![TrellisLocalStudio create screen and example library](docs/images/studio-screenshot-2026-11-19.jpg)
 
 The screenshot shows the local create screen and a sample library card. Open a model to orbit it in the interactive preview:
 
